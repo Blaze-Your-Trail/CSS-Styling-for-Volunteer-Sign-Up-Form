@@ -1,0 +1,92 @@
+<apex:page controller="GW_Volunteers.VOL_CTRL_VolunteersSignupFS" language="{!strLanguage}" showheader="false" sidebar="false" standardStylesheets="false" cache="false">
+
+    <!-- Bootstrap start -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <!-- Bootstrap end -->
+    <style>
+body {
+  color: #566787;
+  background: #ffffff;
+  font-family: "Open Sans", sans-serif;
+}
+
+table td {
+  padding: 8px;
+}
+
+.cssForm {
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.cssForm textarea {
+  resize: vertical;
+}
+
+.cssForm .form-control, .cssForm input[type=button] {
+  min-height: 38px;
+  border-radius: 2px;
+}
+
+.cssForm input[type=button] {
+  min-width: 150px;
+  background: #299be4;
+  color: #ffffff;
+  border: none;
+}
+
+.cssForm input[type=button]:hover {
+  background: #1c8cd7; 
+}
+.cssForm label {
+  opacity: 0.9;
+}    
+    </style>
+    <apex:form id="frm" styleClass="cssForm" >  
+        <table columns="2" border="0">
+            <!-- first we specify the fields we require for Contact matching -->
+            <tr>
+                <td class="cssLabelsColumn" ><apex:outputLabel value="{!$ObjectType.Contact.Fields.FirstName.Label + '*'}" for="txtFirstName" /></td>
+                <td class="cssInputFieldsColumn" ><apex:inputField value="{!contact.FirstName}" id="txtFirstName" required="true" styleClass="form-control" /></td>
+            </tr>
+            <tr>    
+                <td class="cssLabelsColumn" ><apex:outputLabel value="{!$ObjectType.Contact.Fields.LastName.Label + '*'}" for="txtLastName" /></td>
+                <td class="cssInputFieldsColumn" ><apex:inputField value="{!contact.LastName}" id="txtLastName" required="true" styleClass="form-control" /></td>
+            </tr>
+            <tr>            
+                <td class="cssLabelsColumn" ><apex:outputLabel value="{!$ObjectType.Contact.Fields.Email.Label + '*'}" for="txtEmail" /></td>
+                <td class="cssInputFieldsColumn" ><apex:inputField value="{!contact.Email}" id="txtEmail" required="true" styleClass="form-control" /></td>
+            </tr>
+            
+            <!--  now add optional fields the user can specify -->
+            <apex:repeat value="{!$ObjectType.Contact.FieldSets.GW_Volunteers__VolunteersSignupFS}" var="f" >
+                <tr>
+                    <td class="cssLabelsColumn" ><apex:outputLabel value="{!f.Label + IF(OR(f.DBRequired, f.Required), '*', '')}" /></td>
+                    <td class="cssInputFieldsColumn" ><apex:inputField value="{!Contact[f]}" required="{!IF(OR(f.DBRequired, f.Required), 'true', 'false')}"
+                        styleClass="{!IF(f.Type == 'Long Text Area', 'form-control cssTextArea', 'form-control')}" /></td>
+                </tr>
+            </apex:repeat>        
+
+            <!-- add optional File Upload -->
+            <tr>            
+                <td class="cssLabelsColumn" ><apex:outputLabel value="{!strFileUploadLabel}" for="txtFileUpload" /></td>
+                <td class="cssInputFieldsColumn" ><apex:inputFile styleClass="form-control" rendered="{!strFileUploadLabel!=null}" value="{!attachment.body}" filename="{!attachment.name}" id="txtFileUpload" /></td>
+            </tr>
+
+            <tr>
+                <td></td>        
+                <td class="cssInputFieldsColumn" >
+                    <apex:commandButton value="{!$Label.GW_Volunteers__labelSubmitButton}" id="btnSave" 
+                        onclick="document.getElementById('{!$Component.btnSave}').disabled=true;DoSave();" rerender="frm"/>
+                    <apex:actionFunction name="DoSave" action="{!Save}" />         
+                </td>
+            </tr>   
+            <tr>
+                <td></td>
+                <td class="cssInputFieldsColumn" ><apex:outputLabel value="{!StrSaveResult}" /></td>
+            </tr>   
+        </table>
+        <apex:messages style="color:red;" />            
+    </apex:form>
+</apex:page>
